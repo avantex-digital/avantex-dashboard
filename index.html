@@ -211,9 +211,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
     <div class="login-error" id="login-err">Correo o contraseña incorrectos.</div>
     <button class="btn-login" onclick="doLogin()">Iniciar Sesión</button>
     <div class="login-hint">
-      <strong style="color:var(--blue)">Admin:</strong> admin@avantex.com / admin123<br>
-      <strong style="color:var(--blue)">Marketing:</strong> marketing@avantex.com / mkt123<br>
-      <strong style="color:var(--blue)">Dirección:</strong> direccion@avantex.com / dir123
+      <strong style="color:var(--blue)">Admin:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5f3e3b3236311f3e293e312b3a27713c3032">[email&#160;protected]</a> / admin123<br>
+      <strong style="color:var(--blue)">Marketing:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f29f93809997869b9c95b29384939c86978adc919d9f">[email&#160;protected]</a> / mkt123<br>
+      <strong style="color:var(--blue)">Dirección:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="51353823343232383e3f113027303f2534297f323e3c">[email&#160;protected]</a> / dir123
     </div>
   </div>
 </div>
@@ -610,7 +610,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
   </div><!-- /app-body -->
 </div><!-- /app -->
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ══════════════════════════════════════════════
 // USERS
 // ══════════════════════════════════════════════
@@ -919,24 +919,65 @@ async function aiWeldex() {
 // ══════════════════════════════════════════════
 const VENDORS = [
   {
+    id: 'damaris', name: 'Damaris', avatar: '🏆',
+    camps: [
+      {name:'WHATSAPP - DAMARIS', platform:'meta', client:'Aromatex B2B',
+       spent:1357.22, results:83, cpr:16.35, imp:13638, ctr:2.22, cpm:99.58,
+       status:'top', note:'🏆 CPR $16.35 MXN — MEJOR DEL PORTAFOLIO. 83 conversaciones en 9 días.'}
+    ],
+    kpis: {total_spent:1357, total_results:83, best_metric:'🏆 CPR $16.35', platform_mix:'Meta Ads'}
+  },
+  {
     id: 'azael', name: 'Azael', avatar: '🦅',
     camps: [
-      {name:'Pestex - Búsqueda - Nuevo León', platform:'google', client:'Pestex',
-       spent:16867, clicks:765, conv:0, imp:505392, cpa:0, ctr:0.15,
-       status:'active', note:'Campaña nueva — fase de aprendizaje. Sin conversiones aún.',
-       device_split:'Mobile 72% / Desktop 28%'},
-      {name:'Weldu - Fumigaciones - Monterrey', platform:'meta', client:'Weldu',
-       spent:1613, results:86, cpr:19, imp:9207, ctr:4.79, cpm:175.2,
-       status:'active', note:'CPR $19 MXN — excelente. Bajó de $137 en marzo.'}
+      {name:'Weldu App - Fumigaciones - Monterrey', platform:'meta', client:'Weldu',
+       spent:1613.44, results:86, cpr:18.76, imp:27048, ctr:4.32, cpm:59.63,
+       status:'top', note:'📈 CPR $18.76 — SEGUNDO MEJOR. CTR 4.32% excelente.'}
     ],
-    kpis: {total_spent:18480, total_results:86, best_metric:'CPR $19 Weldu MTY', platform_mix:'Meta + Google'}
+    kpis: {total_spent:1613, total_results:86, best_metric:'CPR $18.76', platform_mix:'Meta Ads'}
+  },
+  {
+    id: 'magnali', name: 'Magnali', avatar: '💼',
+    camps: [
+      {name:'WHATSAPP - MAGNALI', platform:'meta', client:'Aromatex B2B',
+       spent:1872.39, results:61, cpr:30.69, imp:21452, ctr:2.58, cpm:87.27,
+       status:'active', note:'CPR $30.69 estable, CTR 2.58% buen performance.'}
+    ],
+    kpis: {total_spent:1872, total_results:61, best_metric:'CPR $30.69', platform_mix:'Meta Ads'}
+  },
+  {
+    id: 'janeth', name: 'Janeth', avatar: '💼',
+    camps: [
+      {name:'WHATSAPP - JANETH', platform:'meta', client:'Aromatex B2B',
+       spent:1300.36, results:41, cpr:31.72, imp:22790, ctr:1.69, cpm:57.04,
+       status:'active', note:'CPR $31.72, CTR bajo (1.69%) — optimizar creativos.'}
+    ],
+    kpis: {total_spent:1300, total_results:41, best_metric:'CPR $31.72', platform_mix:'Meta Ads'}
+  },
+  {
+    id: 'violeta', name: 'Violeta', avatar: '🌸',
+    camps: [
+      {name:'Aromatex B2C - Roomspray, Velas, Rattan (Abril)', platform:'google', client:'Aromatex',
+       spent:27741.30, results:27, cpr:1027.46, imp:154837, cpc:13.67, ctr:2.18, roas:0.21,
+       status:'alert', note:'🛑 CRÍTICO: CPR $1,027, ROAS 0.21x. REQUIERE REVISIÓN INMEDIATA.'}
+    ],
+    kpis: {total_spent:27741, total_results:27, best_metric:'🛑 CRÍTICO CPR $1K', platform_mix:'Google Ads'}
+  },
+  {
+    id: 'angelica', name: 'Angélica', avatar: '💼',
+    camps: [
+      {name:'WHATSAPP - ANGELICA', platform:'meta', client:'Aromatex B2B',
+       spent:2445.29, results:59, cpr:41.45, imp:21439, ctr:2.12, cpm:114.03,
+       status:'alert', note:'⚠️ CPR ALTO ($41.45). Necesita optimización urgente de creativos y segmentación.'}
+    ],
+    kpis: {total_spent:2445, total_results:59, best_metric:'CPR $41.45 (⚠️)', platform_mix:'Meta Ads'}
   },
   {
     id: 'ana', name: 'Ana Corona', avatar: '👩',
     camps: [
       {name:'Pestex - Búsqueda - Guadalajara', platform:'google', client:'Pestex',
        spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
-       status:'pending', note:'Campaña pendiente de activación en Abril 2026.'}
+       status:'pending', note:'Campaña pendiente de datos en Abril 2026.'}
     ],
     kpis: {total_spent:0, total_results:0, best_metric:'Pendiente', platform_mix:'Google Ads'}
   },
@@ -945,57 +986,9 @@ const VENDORS = [
     camps: [
       {name:'Pestex - Búsqueda - CDMX', platform:'google', client:'Pestex',
        spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
-       status:'pending', note:'Campaña pendiente de activación en Abril 2026.'}
+       status:'pending', note:'Campaña pendiente de datos en Abril 2026.'}
     ],
     kpis: {total_spent:0, total_results:0, best_metric:'Pendiente', platform_mix:'Google Ads'}
-  },
-  {
-    id: 'violeta', name: 'Violeta', avatar: '🌸',
-    camps: [
-      {name:'Aromatex B2B - Búsqueda (Google)', platform:'google', client:'Aromatex',
-       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
-       status:'active', note:'Campaña nueva en Google Ads — fase de aprendizaje.'},
-      {name:'Aromatex B2C - Shopping (Google)', platform:'google', client:'Aromatex',
-       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
-       status:'active', note:'Campaña nueva en Google Ads — fase de aprendizaje.'}
-    ],
-    kpis: {total_spent:0, total_results:0, best_metric:'Campañas nuevas', platform_mix:'Google Ads'}
-  },
-  {
-    id: 'angelica', name: 'Angélica', avatar: '💼',
-    camps: [
-      {name:'WHATSAPP - ANGELICA - Actualizado', platform:'meta', client:'Aromatex B2B',
-       spent:2445, results:59, cpr:41, imp:16241, ctr:0.72, cpm:150.5,
-       status:'alert', note:'⚠️ CPR subió de $19.40 a $41 MXN (+111%). CTR cayó de 2.55% a 0.72%. Revisar urgente.'}
-    ],
-    kpis: {total_spent:2445, total_results:59, best_metric:'CPR $41 (vs $19 marzo)', platform_mix:'Meta Ads'}
-  },
-  {
-    id: 'magnali', name: 'Magnali', avatar: '💼',
-    camps: [
-      {name:'WHATSAPP - MAGNALI - Actualizado', platform:'meta', client:'Aromatex B2B',
-       spent:1872, results:61, cpr:31, imp:14500, ctr:2.60, cpm:129.1,
-       status:'active', note:'CPR $31 eficiente, CTR 2.60% excelente. Escalar presupuesto.'}
-    ],
-    kpis: {total_spent:1872, total_results:61, best_metric:'CPR $31 / CTR 2.60%', platform_mix:'Meta Ads'}
-  },
-  {
-    id: 'janeth', name: 'Janeth', avatar: '💼',
-    camps: [
-      {name:'WHATSAPP - JANETH - Actualizado', platform:'meta', client:'Aromatex B2B',
-       spent:1300, results:41, cpr:32, imp:12000, ctr:2.20, cpm:108.3,
-       status:'active', note:'CPR bajó de $36 a $32 vs marzo. Mejora sostenida.'}
-    ],
-    kpis: {total_spent:1300, total_results:41, best_metric:'CPR $32 mejorado vs marzo', platform_mix:'Meta Ads'}
-  },
-  {
-    id: 'damaris', name: 'Damaris', avatar: '🏆',
-    camps: [
-      {name:'WHATSAPP - DAMARIS - Actualizado', platform:'meta', client:'Aromatex B2B',
-       spent:1357, results:83, cpr:16, imp:10800, ctr:2.40, cpm:125.7,
-       status:'top', note:'🏆 CPR $16 MXN — el mejor del portafolio completo. Duplicar presupuesto.'}
-    ],
-    kpis: {total_spent:1357, total_results:83, best_metric:'CPR $16 — #1 del portafolio', platform_mix:'Meta Ads'}
   }
 ];
 
@@ -1213,9 +1206,23 @@ function renderCreatives() {
   }).join('');
 }
 
+// ══════════════════════════════════════════════
+// DATOS DE VENDEDORES - ACTUALIZADO 1-9 ABRIL 2026
+// ══════════════════════════════════════════════
+const VENDORS_DATA = {
+  "Damaris": { cpr: 16.35, spent: 1357.22, results: 83, impressions: 13638, cpc: 8.43, ctr: 2.22, status: "top", ranking: 1 },
+  "Azael": { cpr: 18.76, spent: 1613.44, results: 86, impressions: 27048, cpc: 1.38, ctr: 4.32, status: "top", ranking: 2 },
+  "Magnali": { cpr: 30.69, spent: 1872.39, results: 61, impressions: 21452, cpc: 13.97, ctr: 2.58, status: "active", ranking: 3 },
+  "Janeth": { cpr: 31.72, spent: 1300.36, results: 41, impressions: 22790, cpc: 10.68, ctr: 1.69, status: "active", ranking: 4 },
+  "MTY": { cpr: 33.08, spent: 3440.81, results: 104, impressions: 43473, cpc: 14.33, ctr: 2.53, status: "active", ranking: 5 },
+  "CDMX": { cpr: 33.88, spent: 7419.54, results: 219, impressions: 81770, cpc: 5.42, ctr: 2.85, status: "active", ranking: 6 },
+  "Angelica": { cpr: 41.45, spent: 2445.29, results: 59, impressions: 21439, cpc: 15.34, ctr: 2.12, status: "alert", ranking: 7 },
+  "Violeta": { cpr: 1027.46, spent: 27741.30, results: 27, impressions: 154837, cpc: 13.67, ctr: 2.18, roas: 0.21, status: "alert", ranking: 8 }
+};
+
 async function aiVendors() {
   showPage('ai');
-  const msg = 'Analiza el performance de cada vendedor en Abril 2026: Damaris CPR $16 (mejor), Magnali CPR $31, Janeth CPR $32, CDMX CPR $41, Angelica CPR $41 (subio de $19). Azael tiene Weldu MTY CPR $19 y Pestex NL en aprendizaje. Ana Corona y Juan Carlos tienen campanas pendientes. Dame un ranking de vendedores con acciones especificas para cada uno.';
+  const msg = 'Analiza el performance de vendedores (1-9 Abril 2026): Damaris CPR $16.35 (TOP 🏆 con 83 conversaciones), Azael CPR $18.76 (2do lugar, Weldu MTY con CTR 4.32%), Magnali CPR $30.69 (61 conversaciones), Janeth CPR $31.72 (CTR bajo), CDMX CPR $33.88 (zona mixta), Angelica CPR $41.45 (CRÍTICA - necesita creativos), Violeta CPR $1,027 (CRÍTICA - Google Ads Aromatex B2C con ROAS 0.21x). Dame ranking, benchmarks, acciones específicas y recomendaciones de copy/creativos.';
   aiAddMsg(msg, true);
   await aiCall(msg);
 }
@@ -1227,23 +1234,7 @@ async function aiCreatives() {
   await aiCall(msg);
 }
 
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
-function init() {
-  renderCampSection('b2c');
-  renderCampSection('b2b');
-  renderCampSection('weldu');
-  renderDecisions();
-  renderVendors();
-  renderCreatives();
-  initCharts();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const t = new Date();
-  t.setDate(t.getDate() + 2);
-});
+// ═════════════════════════════════════════════
 </script>
 </body>
 </html>
