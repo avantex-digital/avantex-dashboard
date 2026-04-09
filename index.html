@@ -921,9 +921,9 @@ const VENDORS = [
   {
     id: 'damaris', name: 'Damaris', avatar: '🏆',
     camps: [
-      {name:'WHATSAPP - DAMARIS', platform:'meta', client:'Aromatex B2B',
+      {name:'WHATSAPP - DAMARIS - Aromatex B2B', platform:'meta', client:'Aromatex B2B',
        spent:1357.22, results:83, cpr:16.35, imp:13638, ctr:2.22, cpm:99.58,
-       status:'top', note:'🏆 CPR $16.35 MXN — MEJOR DEL PORTAFOLIO. 83 conversaciones en 9 días.'}
+       status:'top', note:'🏆 #1 MEJOR. CPR $16.35. 83 conversaciones.'}
     ],
     kpis: {total_spent:1357, total_results:83, best_metric:'🏆 CPR $16.35', platform_mix:'Meta Ads'}
   },
@@ -932,63 +932,72 @@ const VENDORS = [
     camps: [
       {name:'Weldu App - Fumigaciones - Monterrey', platform:'meta', client:'Weldu',
        spent:1613.44, results:86, cpr:18.76, imp:27048, ctr:4.32, cpm:59.63,
-       status:'top', note:'📈 CPR $18.76 — SEGUNDO MEJOR. CTR 4.32% excelente.'}
+       status:'top', note:'📈 Weldu MTY - CPR $18.76. 86 conversaciones. CTR 4.32%.'},
+      {name:'Pestex - Búsqueda - Nuevo León', platform:'google', client:'Pestex',
+       spent:6130.79, clicks:366, conv:0, imp:13555, cpa:0, ctr:2.70, cpc:16.75,
+       status:'active', note:'Google Ads - $6,130.79. 366 clics, CTR 2.70%, CPC $16.75.'}
     ],
-    kpis: {total_spent:1613, total_results:86, best_metric:'CPR $18.76', platform_mix:'Meta Ads'}
+    kpis: {total_spent:7744, total_results:86, best_metric:'Meta: $18.76 CPR / Google: 2.70% CTR', platform_mix:'Meta + Google'}
   },
   {
     id: 'magnali', name: 'Magnali', avatar: '💼',
     camps: [
-      {name:'WHATSAPP - MAGNALI', platform:'meta', client:'Aromatex B2B',
+      {name:'WHATSAPP - MAGNALI - Aromatex B2B', platform:'meta', client:'Aromatex B2B',
        spent:1872.39, results:61, cpr:30.69, imp:21452, ctr:2.58, cpm:87.27,
-       status:'active', note:'CPR $30.69 estable, CTR 2.58% buen performance.'}
+       status:'active', note:'✅ #3 CPR $30.69. 61 conversaciones.'}
     ],
     kpis: {total_spent:1872, total_results:61, best_metric:'CPR $30.69', platform_mix:'Meta Ads'}
   },
   {
     id: 'janeth', name: 'Janeth', avatar: '💼',
     camps: [
-      {name:'WHATSAPP - JANETH', platform:'meta', client:'Aromatex B2B',
+      {name:'WHATSAPP - JANETH - Aromatex B2B', platform:'meta', client:'Aromatex B2B',
        spent:1300.36, results:41, cpr:31.72, imp:22790, ctr:1.69, cpm:57.04,
-       status:'active', note:'CPR $31.72, CTR bajo (1.69%) — optimizar creativos.'}
+       status:'active', note:'✅ #4 CPR $31.72. 41 conversaciones. CTR bajo.'}
     ],
     kpis: {total_spent:1300, total_results:41, best_metric:'CPR $31.72', platform_mix:'Meta Ads'}
   },
   {
-    id: 'violeta', name: 'Violeta', avatar: '🌸',
+    id: 'angelica', name: 'Angelica', avatar: '💼',
     camps: [
-      {name:'Aromatex B2C - Roomspray, Velas, Rattan (Abril)', platform:'google', client:'Aromatex',
-       spent:27741.30, results:27, cpr:1027.46, imp:154837, cpc:13.67, ctr:2.18, roas:0.21,
-       status:'alert', note:'🛑 CRÍTICO: CPR $1,027, ROAS 0.21x. REQUIERE REVISIÓN INMEDIATA.'}
-    ],
-    kpis: {total_spent:27741, total_results:27, best_metric:'🛑 CRÍTICO CPR $1K', platform_mix:'Google Ads'}
-  },
-  {
-    id: 'angelica', name: 'Angélica', avatar: '💼',
-    camps: [
-      {name:'WHATSAPP - ANGELICA', platform:'meta', client:'Aromatex B2B',
+      {name:'WHATSAPP - ANGELICA - Aromatex B2B', platform:'meta', client:'Aromatex B2B',
        spent:2445.29, results:59, cpr:41.45, imp:21439, ctr:2.12, cpm:114.03,
-       status:'alert', note:'⚠️ CPR ALTO ($41.45). Necesita optimización urgente de creativos y segmentación.'}
+       status:'alert', note:'⚠️ #5 CPR ALTO $41.45. Optimizar creativos.'}
     ],
     kpis: {total_spent:2445, total_results:59, best_metric:'CPR $41.45 (⚠️)', platform_mix:'Meta Ads'}
   },
   {
+    id: 'violeta', name: 'Violeta', avatar: '🌸',
+    camps: [
+      {name:'Aromatex B2C - Roomspray, Velas, Rattan (Google)', platform:'google', client:'Aromatex Home',
+       spent:27741.30, results:27, cpr:1027.46, imp:154837, cpc:13.67, ctr:2.18, roas:0.21,
+       status:'alert', note:'🛑 CRÍTICO #6. CPR $1,027. ROAS 0.21x. PAUSAR.'},
+      {name:'Aromatex B2B - Búsqueda (Google)', platform:'google', client:'Aromatex Home',
+       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
+       status:'active', note:'Google Ads - Sin datos aún.'},
+      {name:'Aromatex B2C - Shopping (Google)', platform:'google', client:'Aromatex Home',
+       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
+       status:'active', note:'Google Ads - Sin datos aún.'}
+    ],
+    kpis: {total_spent:27741, total_results:27, best_metric:'🛑 CPR $1K', platform_mix:'Google Ads'}
+  },
+  {
     id: 'ana', name: 'Ana Corona', avatar: '👩',
     camps: [
-      {name:'Pestex - Búsqueda - Guadalajara', platform:'google', client:'Pestex',
-       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
-       status:'pending', note:'Campaña pendiente de datos en Abril 2026.'}
+      {name:'Pestex - Búsqueda - Abril 2026 - Guadalajara', platform:'google', client:'Pestex',
+       spent:5312.39, clicks:136, conv:0, imp:3090, cpa:0, ctr:4.40, cpc:39.06,
+       status:'active', note:'Google Ads - $5,312.39. 136 clics, CTR 4.40%, CPC $39.06.'}
     ],
-    kpis: {total_spent:0, total_results:0, best_metric:'Pendiente', platform_mix:'Google Ads'}
+    kpis: {total_spent:5312, total_results:0, best_metric:'CTR 4.40% (Mejor)', platform_mix:'Google Ads'}
   },
   {
     id: 'juan', name: 'Juan Carlos', avatar: '👨',
     camps: [
-      {name:'Pestex - Búsqueda - CDMX', platform:'google', client:'Pestex',
-       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
-       status:'pending', note:'Campaña pendiente de datos en Abril 2026.'}
+      {name:'Pestex - Búsqueda - Abril 2026 - CDMX', platform:'google', client:'Pestex',
+       spent:5424.34, clicks:263, conv:0, imp:7225, cpa:0, ctr:3.64, cpc:20.62,
+       status:'active', note:'Google Ads - $5,424.34. 263 clics, CTR 3.64%, CPC $20.62.'}
     ],
-    kpis: {total_spent:0, total_results:0, best_metric:'Pendiente', platform_mix:'Google Ads'}
+    kpis: {total_spent:5424, total_results:0, best_metric:'CPC $20.62 (Eficiente)', platform_mix:'Google Ads'}
   }
 ];
 
