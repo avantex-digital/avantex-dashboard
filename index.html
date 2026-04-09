@@ -266,6 +266,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
       <div class="sidebar-label" style="margin-top:8px">Reportes</div>
       <div class="nav-item" id="nav-budget" onclick="showPage('budget')"><span class="ico">💰</span>Presupuesto</div>
       <div class="nav-item" id="nav-decisions" onclick="showPage('decisions')"><span class="ico">⚡</span>Decisiones</div>
+      <div class="nav-item" id="nav-vendors" onclick="showPage('vendors')"><span class="ico">👤</span>Performance Vendedor</div>
+      <div class="nav-item" id="nav-creatives" onclick="showPage('creatives')"><span class="ico">🎨</span>Creativos & Copy</div>
     </div>
 
     <!-- MAIN -->
@@ -555,6 +557,55 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:
         </div>
       </div>
 
+
+      <!-- ═══ PERFORMANCE VENDEDOR ═══ -->
+      <div class="page" id="page-vendors">
+        <div class="section-header">
+          <div class="section-title">👤 Performance por Vendedor</div>
+          <div class="section-sub">Campañas asignadas · Métricas individuales · Abril 2026</div>
+        </div>
+
+        <!-- SELECTOR DE VENDEDOR -->
+        <div class="filters-bar">
+          <span class="filter-label">Vendedor:</span>
+          <span class="filter-tag active" onclick="filterVendor('all',this)">Todos</span>
+          <span class="filter-tag" onclick="filterVendor('azael',this)">Azael</span>
+          <span class="filter-tag" onclick="filterVendor('ana',this)">Ana Corona</span>
+          <span class="filter-tag" onclick="filterVendor('juan',this)">Juan Carlos</span>
+          <span class="filter-tag" onclick="filterVendor('violeta',this)">Violeta</span>
+          <span class="filter-tag" onclick="filterVendor('angelica',this)">Angélica</span>
+          <span class="filter-tag" onclick="filterVendor('magnali',this)">Magnali</span>
+          <span class="filter-tag" onclick="filterVendor('janeth',this)">Janeth</span>
+          <span class="filter-tag" onclick="filterVendor('damaris',this)">Damaris</span>
+          <div style="margin-left:auto">
+            <button class="btn btn-outline btn-sm" onclick="aiVendors()">🤖 Análisis IA Vendedores</button>
+          </div>
+        </div>
+
+        <div id="vendors-container"></div>
+      </div>
+
+      <!-- ═══ CREATIVOS & COPY ═══ -->
+      <div class="page" id="page-creatives">
+        <div class="section-header">
+          <div class="section-title">🎨 Creativos & Copy</div>
+          <div class="section-sub">Análisis de anuncios · Sugerencias de copy por campaña · Abril 2026</div>
+        </div>
+
+        <div class="filters-bar">
+          <span class="filter-label">Unidad:</span>
+          <span class="filter-tag active" onclick="filterCreative('all',this)">Todas</span>
+          <span class="filter-tag" onclick="filterCreative('b2c',this)">Aromatex B2C</span>
+          <span class="filter-tag" onclick="filterCreative('b2b',this)">Aromatex B2B</span>
+          <span class="filter-tag" onclick="filterCreative('weldu',this)">Weldu</span>
+          <div style="margin-left:auto">
+            <button class="btn btn-blue btn-sm" onclick="aiCreatives()">🤖 Generar sugerencias de copy</button>
+          </div>
+        </div>
+
+        <div id="creatives-container"></div>
+      </div>
+
     </div><!-- /main -->
   </div><!-- /app-body -->
 </div><!-- /app -->
@@ -802,23 +853,27 @@ async function aiCall(msg) {
   if (status) status.textContent = 'Analizando...';
   aiShowThinking();
 
-  // Usa el servidor local (Render) como proxy para evitar CORS
-  const API_URL = window.location.origin + '/api/claude';
+  const PROXY = 'https://script.google.com/macros/s/AKfycbyuvjfAvrnC4MU67KYCtXbQ4KlNV_RbuNRJgz71BsfehhOOyctdKx61_OFk-9Pzh8TH/exec';
 
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, system: AI_CONTEXT })
-    });
-    const data = await res.json();
+    // Use GET with encoded message (Apps Script only supports GET via doGet)
+    const encoded = encodeURIComponent(msg.substring(0, 400));
+    const url = PROXY + '?action=claude&msg=' + encoded;
+    const res = await fetch(url, { redirect: 'follow' });
+    const text = await res.text();
     aiRemoveThinking();
-    const reply = data.reply || data.error || 'Sin respuesta del agente';
+    let reply = '';
+    try {
+      const data = JSON.parse(text);
+      reply = data.reply || data.error || 'Sin respuesta del agente';
+    } catch(e) {
+      reply = text.length > 10 ? text.substring(0, 800) : 'Error al procesar respuesta';
+    }
     const formatted = reply.split('\n').join('<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     aiAddMsg(formatted, false);
   } catch (err) {
     aiRemoveThinking();
-    aiAddMsg('Error al conectar con el servidor. Verifica que el servidor Render este activo.', false);
+    aiAddMsg('Error al conectar con el proxy. Verifica que Apps Script este desplegado correctamente.', false);
     console.error(err);
   }
   if (status) status.textContent = 'Listo';
@@ -845,11 +900,9 @@ async function aiWeldex() {
   if (!output) return;
   output.innerHTML = '<div class="ai-thinking"><span></span><span></span><span></span></div>';
   try {
-    const res = await fetch(window.location.origin + '/api/claude', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'Analiza Weldex Google Ads abril 2026: campanas nuevas, 0 conv, $16,867 MXN gasto, 765 clics, mobile 72%. Recomendaciones para fase de aprendizaje.', system: AI_CONTEXT })
-    });
+    const PROXY = 'https://script.google.com/macros/s/AKfycbyuvjfAvrnC4MU67KYCtXbQ4KlNV_RbuNRJgz71BsfehhOOyctdKx61_OFk-9Pzh8TH/exec';
+    const wMsg = encodeURIComponent('Analiza Weldex Google Ads abril 2026: campanas nuevas, 0 conv, $16,867 MXN gasto, 765 clics, mobile 72%. Recomendaciones para fase de aprendizaje.');
+    const res = await fetch(PROXY + '?action=claude&msg=' + wMsg, { redirect: 'follow' });
     const text = await res.text();
     let reply = '';
     try { const d = JSON.parse(text); reply = d.reply || d.error || text; } catch(e) { reply = text; }
@@ -860,6 +913,320 @@ async function aiWeldex() {
   }
 }
 
+
+// ══════════════════════════════════════════════
+// VENDORS DATA — ABRIL 2026
+// ══════════════════════════════════════════════
+const VENDORS = [
+  {
+    id: 'azael', name: 'Azael', avatar: '🦅',
+    camps: [
+      {name:'Pestex - Búsqueda - Nuevo León', platform:'google', client:'Pestex',
+       spent:16867, clicks:765, conv:0, imp:505392, cpa:0, ctr:0.15,
+       status:'active', note:'Campaña nueva — fase de aprendizaje. Sin conversiones aún.',
+       device_split:'Mobile 72% / Desktop 28%'},
+      {name:'Weldu - Fumigaciones - Monterrey', platform:'meta', client:'Weldu',
+       spent:1613, results:86, cpr:19, imp:9207, ctr:4.79, cpm:175.2,
+       status:'active', note:'CPR $19 MXN — excelente. Bajó de $137 en marzo.'}
+    ],
+    kpis: {total_spent:18480, total_results:86, best_metric:'CPR $19 Weldu MTY', platform_mix:'Meta + Google'}
+  },
+  {
+    id: 'ana', name: 'Ana Corona', avatar: '👩',
+    camps: [
+      {name:'Pestex - Búsqueda - Guadalajara', platform:'google', client:'Pestex',
+       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
+       status:'pending', note:'Campaña pendiente de activación en Abril 2026.'}
+    ],
+    kpis: {total_spent:0, total_results:0, best_metric:'Pendiente', platform_mix:'Google Ads'}
+  },
+  {
+    id: 'juan', name: 'Juan Carlos', avatar: '👨',
+    camps: [
+      {name:'Pestex - Búsqueda - CDMX', platform:'google', client:'Pestex',
+       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
+       status:'pending', note:'Campaña pendiente de activación en Abril 2026.'}
+    ],
+    kpis: {total_spent:0, total_results:0, best_metric:'Pendiente', platform_mix:'Google Ads'}
+  },
+  {
+    id: 'violeta', name: 'Violeta', avatar: '🌸',
+    camps: [
+      {name:'Aromatex B2B - Búsqueda (Google)', platform:'google', client:'Aromatex',
+       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
+       status:'active', note:'Campaña nueva en Google Ads — fase de aprendizaje.'},
+      {name:'Aromatex B2C - Shopping (Google)', platform:'google', client:'Aromatex',
+       spent:0, clicks:0, conv:0, imp:0, cpa:0, ctr:0,
+       status:'active', note:'Campaña nueva en Google Ads — fase de aprendizaje.'}
+    ],
+    kpis: {total_spent:0, total_results:0, best_metric:'Campañas nuevas', platform_mix:'Google Ads'}
+  },
+  {
+    id: 'angelica', name: 'Angélica', avatar: '💼',
+    camps: [
+      {name:'WHATSAPP - ANGELICA - Actualizado', platform:'meta', client:'Aromatex B2B',
+       spent:2445, results:59, cpr:41, imp:16241, ctr:0.72, cpm:150.5,
+       status:'alert', note:'⚠️ CPR subió de $19.40 a $41 MXN (+111%). CTR cayó de 2.55% a 0.72%. Revisar urgente.'}
+    ],
+    kpis: {total_spent:2445, total_results:59, best_metric:'CPR $41 (vs $19 marzo)', platform_mix:'Meta Ads'}
+  },
+  {
+    id: 'magnali', name: 'Magnali', avatar: '💼',
+    camps: [
+      {name:'WHATSAPP - MAGNALI - Actualizado', platform:'meta', client:'Aromatex B2B',
+       spent:1872, results:61, cpr:31, imp:14500, ctr:2.60, cpm:129.1,
+       status:'active', note:'CPR $31 eficiente, CTR 2.60% excelente. Escalar presupuesto.'}
+    ],
+    kpis: {total_spent:1872, total_results:61, best_metric:'CPR $31 / CTR 2.60%', platform_mix:'Meta Ads'}
+  },
+  {
+    id: 'janeth', name: 'Janeth', avatar: '💼',
+    camps: [
+      {name:'WHATSAPP - JANETH - Actualizado', platform:'meta', client:'Aromatex B2B',
+       spent:1300, results:41, cpr:32, imp:12000, ctr:2.20, cpm:108.3,
+       status:'active', note:'CPR bajó de $36 a $32 vs marzo. Mejora sostenida.'}
+    ],
+    kpis: {total_spent:1300, total_results:41, best_metric:'CPR $32 mejorado vs marzo', platform_mix:'Meta Ads'}
+  },
+  {
+    id: 'damaris', name: 'Damaris', avatar: '🏆',
+    camps: [
+      {name:'WHATSAPP - DAMARIS - Actualizado', platform:'meta', client:'Aromatex B2B',
+       spent:1357, results:83, cpr:16, imp:10800, ctr:2.40, cpm:125.7,
+       status:'top', note:'🏆 CPR $16 MXN — el mejor del portafolio completo. Duplicar presupuesto.'}
+    ],
+    kpis: {total_spent:1357, total_results:83, best_metric:'CPR $16 — #1 del portafolio', platform_mix:'Meta Ads'}
+  }
+];
+
+// ══════════════════════════════════════════════
+// CREATIVES DATA — ABRIL 2026
+// ══════════════════════════════════════════════
+const CREATIVES = [
+  {
+    client:'b2c', campaign:'PF - Ticket Alto iOS', status:'top',
+    format:'Video + Imagen', objective:'Compras',
+    metrics:{ctr:1.53, cpm:75.4, roas:8.56, freq:1.98},
+    analysis:'El creativo de mayor rendimiento del portafolio B2C. ROAS 8.56x indica alta afinidad audiencia-mensaje. Frecuencia 1.98 — aún hay espacio antes de saturar.',
+    copy_actual:'Copy actual orientado a ticket alto con beneficios premium',
+    copy_suggestions:[
+      '"Tu hogar merece el mejor aroma. Envío gratis hoy." — Urgencia + beneficio',
+      '"El difusor favorito de 10,000 hogares mexicanos" — Prueba social',
+      '"Aromatiza tu espacio en segundos. Desde $X MXN" — Precio + facilidad'
+    ],
+    recommendation:'MANTENER y testear copy con prueba social. No cambiar el creativo principal.'
+  },
+  {
+    client:'b2c', campaign:'Roomspray, Velas, Rattan', status:'stop',
+    format:'Imagen estática', objective:'Compras',
+    metrics:{ctr:0.57, cpm:179.2, roas:0.22, freq:2.06},
+    analysis:'ROAS 0.22x confirma que el creativo no conecta con la audiencia. CTR 0.57% muy bajo indica que el anuncio no genera interés. CPM $179 el más caro del portafolio.',
+    copy_actual:'Copy genérico de producto sin diferenciación clara',
+    copy_suggestions:[
+      '"Roomspray artesanal — el regalo perfecto para tu hogar" — Reencuadrar como regalo',
+      '"Velas de soya con aroma duradero. Solo por tiempo limitado" — Urgencia',
+      '"¿Tu hogar huele como quieres? Descúbrelo hoy" — Pregunta generadora'
+    ],
+    recommendation:'PAUSAR campaña. Restructurar con nuevo ángulo de copy enfocado en ocasión de regalo o decoración.'
+  },
+  {
+    client:'b2b', campaign:'WHATSAPP - DAMARIS', status:'top',
+    format:'Imagen + CTA WhatsApp', objective:'Mensajes WhatsApp',
+    metrics:{ctr:2.40, cpm:125.7, roas:null, freq:1.50},
+    analysis:'El anuncio de mejor rendimiento del portafolio B2B. CPR $16 MXN excepcional. La combinación de imagen + llamado a WhatsApp está funcionando perfectamente.',
+    copy_actual:'Copy directo con propuesta de valor clara para negocios',
+    copy_suggestions:[
+      '"¿Tu negocio ya huele al éxito? Escríbenos por WhatsApp" — B2B directo',
+      '"Aromas premium para restaurantes, hoteles y spas. Cotiza gratis" — Segmentación',
+      '"El aroma de tu marca importa. Habla con un experto hoy" — Posicionamiento'
+    ],
+    recommendation:'MANTENER estructura actual. Testear variante con testimonial de cliente empresa.'
+  },
+  {
+    client:'b2b', campaign:'WHATSAPP - ANGELICA', status:'alert',
+    format:'Imagen + CTA WhatsApp', objective:'Mensajes WhatsApp',
+    metrics:{ctr:0.72, cpm:150.5, roas:null, freq:1.59},
+    analysis:'CTR cayó de 2.55% a 0.72% — caída del 72%. El creativo o la audiencia cambiaron. CPM $150.5 muy alto sugiere competencia en el segmento o fatiga de audiencia.',
+    copy_actual:'Copy similar al que funcionó en marzo pero el CTR cayó dramáticamente',
+    copy_suggestions:[
+      'Renovar completamente el creativo con nueva imagen y ángulo diferente',
+      '"Nueva colección de aromas para tu negocio — Disponible ahora" — Novedad',
+      '"Haz que tus clientes recuerden tu negocio por su aroma" — Experiencia del cliente'
+    ],
+    recommendation:'CAMBIAR creativo urgente. Probar imagen diferente y copy completamente nuevo.'
+  },
+  {
+    client:'weldu', campaign:'Fumigaciones - CDMX', status:'top',
+    format:'Video corto + CTA WhatsApp', objective:'Mensajes WhatsApp',
+    metrics:{ctr:5.60, cpm:132.1, roas:null, freq:1.48},
+    analysis:'CTR 5.60% — el más alto de todo el portafolio. El video corto conecta perfectamente con la audiencia CDMX. Frecuencia 1.48 indica audiencia completamente fresca.',
+    copy_actual:'Copy de urgencia + solución inmediata para fumigaciones',
+    copy_suggestions:[
+      '"¿Cucarachas en tu depa? Te mandamos un experto HOY" — Urgencia + solución',
+      '"Fumigación profesional desde $X MXN. Garantía 3 meses" — Precio + garantía',
+      '"Miles de hogares en CDMX ya están libres de plagas con Weldu" — Prueba social'
+    ],
+    recommendation:'MANTENER creativo actual. Escalar presupuesto 50% esta semana.'
+  },
+  {
+    client:'weldu', campaign:'Fumigaciones - Monterrey', status:'top',
+    format:'Video corto + CTA WhatsApp', objective:'Mensajes WhatsApp',
+    metrics:{ctr:4.79, cpm:175.2, roas:null, freq:1.34},
+    analysis:'CPR $19 MXN con frecuencia 1.34 — la más baja del portafolio. Hay mucho espacio para escalar sin saturar la audiencia.',
+    copy_actual:'Copy adaptado al mercado regio con tono directo',
+    copy_suggestions:[
+      '"¿Tienes plagas en tu casa en Monterrey? Nosotros las eliminamos hoy" — Local',
+      '"Fumigación certificada en Monterrey. Agenda en 1 minuto por WhatsApp" — Facilidad',
+      '"El servicio de fumigación más rápido de Monterrey" — Diferenciación'
+    ],
+    recommendation:'ESCALAR presupuesto 50-100%. Testear copy localizado con referencias a colonias de MTY.'
+  }
+];
+
+// ══════════════════════════════════════════════
+// RENDER VENDORS
+// ══════════════════════════════════════════════
+let currentVendorFilter = 'all';
+
+function filterVendor(id, el) {
+  currentVendorFilter = id;
+  document.querySelectorAll('#page-vendors .filter-tag').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderVendors();
+}
+
+function renderVendors() {
+  const container = document.getElementById('vendors-container');
+  if (!container) return;
+  const vendors = currentVendorFilter === 'all' ? VENDORS : VENDORS.filter(v => v.id === currentVendorFilter);
+
+  container.innerHTML = vendors.map(v => {
+    const statusColor = v.camps.some(c => c.status === 'alert') ? 'var(--danger)' :
+                        v.camps.some(c => c.status === 'top') ? 'var(--green)' : 'var(--blue)';
+    return `
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:44px;height:44px;border-radius:50%;background:var(--blue-soft);border:2px solid var(--blue);display:flex;align-items:center;justify-content:center;font-size:22px">${v.avatar}</div>
+          <div>
+            <div style="font-family:var(--font-h);font-size:16px;font-weight:700">${v.name}</div>
+            <div style="font-size:11px;color:var(--text3)">${v.kpis.platform_mix} · ${v.camps.length} campaña${v.camps.length > 1 ? 's' : ''} asignada${v.camps.length > 1 ? 's' : ''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div style="text-align:center"><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Gasto</div><div style="font-weight:700;color:var(--text)">$${v.kpis.total_spent.toLocaleString()}</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Resultados</div><div style="font-weight:700;color:var(--text)">${v.kpis.total_results}</div></div>
+          <div style="text-align:center"><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Top métrica</div><div style="font-weight:700;color:${statusColor};font-size:12px">${v.kpis.best_metric}</div></div>
+        </div>
+      </div>
+      <div class="card-body">
+        ${v.camps.map(c => `
+          <div style="background:var(--surface2);border-radius:var(--rs);padding:14px;margin-bottom:10px;border-left:4px solid ${c.status==='top'?'var(--green)':c.status==='alert'?'var(--danger)':c.status==='pending'?'var(--text3)':'var(--blue)'}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+              <div>
+                <div style="font-weight:700;font-size:13px;margin-bottom:3px">${c.name}</div>
+                <div style="font-size:11px;color:var(--text3)">${c.platform==='meta'?'📘 Meta Ads':'🔴 Google Ads'} · ${c.client}</div>
+              </div>
+              <span class="tag ${c.status==='top'?'tag-active':c.status==='alert'?'':c.status==='pending'?'tag-paused':'tag-active'}" 
+                style="${c.status==='alert'?'background:var(--danger-bg);color:var(--danger)':''}">${c.status==='top'?'🏆 Top':'⚠️ Alerta'}</span>
+            </div>
+            ${c.status !== 'pending' ? `
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:10px">
+              ${c.spent ? `<div class="camp-metric"><div class="camp-metric-label">Gasto</div><div class="camp-metric-value">$${c.spent.toLocaleString()}</div></div>` : ''}
+              ${c.results ? `<div class="camp-metric"><div class="camp-metric-label">Resultados</div><div class="camp-metric-value">${c.results}</div></div>` : ''}
+              ${c.cpr ? `<div class="camp-metric"><div class="camp-metric-label">CPR</div><div class="camp-metric-value" style="color:${c.cpr<30?'var(--green)':c.cpr>50?'var(--danger)':'var(--warn)'}">$${c.cpr}</div></div>` : ''}
+              ${c.clicks ? `<div class="camp-metric"><div class="camp-metric-label">Clics</div><div class="camp-metric-value">${c.clicks}</div></div>` : ''}
+              ${c.imp ? `<div class="camp-metric"><div class="camp-metric-label">Impresiones</div><div class="camp-metric-value">${c.imp > 1000 ? (c.imp/1000).toFixed(0)+'K' : c.imp}</div></div>` : ''}
+              ${c.ctr ? `<div class="camp-metric"><div class="camp-metric-label">CTR</div><div class="camp-metric-value">${c.ctr}%</div></div>` : ''}
+              ${c.cpm ? `<div class="camp-metric"><div class="camp-metric-label">CPM</div><div class="camp-metric-value">$${c.cpm}</div></div>` : ''}
+              ${c.conv !== undefined ? `<div class="camp-metric"><div class="camp-metric-label">Conversiones</div><div class="camp-metric-value">${c.conv}</div></div>` : ''}
+            </div>` : ''}
+            <div style="font-size:12px;color:var(--text2);font-style:italic">${c.note}</div>
+            ${c.device_split ? `<div style="font-size:11px;color:var(--text3);margin-top:4px">📱 ${c.device_split}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// RENDER CREATIVES
+// ══════════════════════════════════════════════
+let currentCreativeFilter = 'all';
+
+function filterCreative(client, el) {
+  currentCreativeFilter = client;
+  document.querySelectorAll('#page-creatives .filter-tag').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  renderCreatives();
+}
+
+function renderCreatives() {
+  const container = document.getElementById('creatives-container');
+  if (!container) return;
+  const creatives = currentCreativeFilter === 'all' ? CREATIVES : CREATIVES.filter(c => c.client === currentCreativeFilter);
+
+  container.innerHTML = creatives.map(c => {
+    const statusColor = c.status === 'top' ? 'var(--green)' : c.status === 'alert' ? 'var(--danger)' : c.status === 'stop' ? 'var(--danger)' : 'var(--blue)';
+    const statusLabel = c.status === 'top' ? '🏆 Top Performer' : c.status === 'alert' ? '⚠️ Revisar' : c.status === 'stop' ? '🛑 Pausar' : '✅ OK';
+    return `
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-header">
+        <div>
+          <div style="font-family:var(--font-h);font-size:15px;font-weight:700;margin-bottom:3px">${c.campaign}</div>
+          <div style="font-size:11px;color:var(--text3)">${c.format} · Objetivo: ${c.objective}</div>
+        </div>
+        <span class="tag" style="background:${c.status==='top'?'var(--green-bg)':c.status==='stop'||c.status==='alert'?'var(--danger-bg)':'var(--blue-soft)'};color:${statusColor}">${statusLabel}</span>
+      </div>
+      <div class="card-body">
+        <!-- Métricas -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px">
+          <div class="camp-metric"><div class="camp-metric-label">CTR</div><div class="camp-metric-value" style="color:${c.metrics.ctr>2?'var(--green)':c.metrics.ctr<1?'var(--danger)':'var(--warn)'}">${c.metrics.ctr}%</div></div>
+          <div class="camp-metric"><div class="camp-metric-label">CPM</div><div class="camp-metric-value">$${c.metrics.cpm}</div></div>
+          ${c.metrics.roas ? `<div class="camp-metric"><div class="camp-metric-label">ROAS</div><div class="camp-metric-value" style="color:${c.metrics.roas>4?'var(--green)':c.metrics.roas<1?'var(--danger)':'var(--warn)'}">${c.metrics.roas}x</div></div>` : ''}
+          <div class="camp-metric"><div class="camp-metric-label">Frecuencia</div><div class="camp-metric-value">${c.metrics.freq}</div></div>
+        </div>
+
+        <!-- Análisis -->
+        <div style="background:var(--surface2);border-radius:var(--rs);padding:12px;margin-bottom:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">📊 Análisis del creativo</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">${c.analysis}</div>
+        </div>
+
+        <!-- Copy suggestions -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">✍️ Sugerencias de copy</div>
+          ${c.copy_suggestions.map((s,i) => `
+            <div style="background:var(--blue-soft);border-radius:var(--rs);padding:10px 14px;margin-bottom:6px;font-size:13px;color:var(--text);border-left:3px solid var(--blue)">
+              <strong style="color:var(--blue);margin-right:6px">Opción ${i+1}:</strong>${s}
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Recomendación -->
+        <div style="background:${c.status==='top'?'var(--green-bg)':c.status==='stop'?'var(--danger-bg)':'var(--warn-bg)'};border-radius:var(--rs);padding:10px 14px;font-size:13px;font-weight:600;color:${statusColor}">
+          💡 ${c.recommendation}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function aiVendors() {
+  showPage('ai');
+  const msg = 'Analiza el performance de cada vendedor en Abril 2026: Damaris CPR $16 (mejor), Magnali CPR $31, Janeth CPR $32, CDMX CPR $41, Angelica CPR $41 (subio de $19). Azael tiene Weldu MTY CPR $19 y Pestex NL en aprendizaje. Ana Corona y Juan Carlos tienen campanas pendientes. Dame un ranking de vendedores con acciones especificas para cada uno.';
+  aiAddMsg(msg, true);
+  await aiCall(msg);
+}
+
+async function aiCreatives() {
+  showPage('ai');
+  const msg = 'Analiza los creativos y copy de las campanas de Abril 2026. Weldu CDMX tiene CTR 5.60% (mejor del portafolio). Roomspray/Velas tiene CTR 0.57% y ROAS 0.22x. Angelica B2B bajo CTR de 2.55% a 0.72%. Damaris tiene CTR 2.40% y CPR $16. Da recomendaciones especificas de copy para cada creativo con 3 variantes de headline por campana.';
+  aiAddMsg(msg, true);
+  await aiCall(msg);
+}
+
 // ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
@@ -868,6 +1235,8 @@ function init() {
   renderCampSection('b2b');
   renderCampSection('weldu');
   renderDecisions();
+  renderVendors();
+  renderCreatives();
   initCharts();
 }
 
