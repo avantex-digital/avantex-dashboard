@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avantex · Dashboard de Pauta Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f4f6fb;--surface:#fff;--surface2:#f0f3fa;--surface3:#e8ecf5;
+  --border:#dde3f0;--border2:#c8d0e8;
+  --blue:#0821b0;--blue-l:#1a35d4;--blue-soft:rgba(8,33,176,.08);--blue-mid:rgba(8,33,176,.15);
+  --accent:#2563eb;--accent2:#7c3aed;--green:#059669;--green-bg:#ecfdf5;
+  --warn:#d97706;--warn-bg:#fffbeb;--danger:#dc2626;--danger-bg:#fef2f2;
+  --meta:#1877F2;--meta-bg:#eff6ff;--google:#EA4335;--google-bg:#fef2f2;
+  --text:#0f172a;--text2:#475569;--text3:#94a3b8;--text-inv:#fff;
+  --font-h:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;
+  --r:14px;--rs:8px;
+  --shadow:0 2px 12px rgba(8,33,176,.08);--shadow-lg:0 8px 32px rgba(8,33,176,.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-b);font-size:14px;min-height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--surface2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0821b0 0%,#1a35d4 40%,#2563eb 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box{background:#fff;border-radius:20px;padding:40px 44px;width:420px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.25)}
+.login-title{font-family:var(--font-h);font-size:20px;font-weight:700;text-align:center;margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:28px}
+.form-group{margin-bottom:16px}
+.form-label{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.form-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font-b);font-size:14px;padding:11px 14px;outline:none;transition:.2s}
+.form-input:focus{border-color:var(--blue);background:#fff}
+.login-error{color:var(--danger);font-size:12px;margin-top:8px;display:none}
+.btn-login{width:100%;background:var(--blue);color:#fff;border:none;border-radius:var(--rs);font-family:var(--font-b);font-size:14px;font-weight:600;padding:13px;cursor:pointer;transition:.2s;margin-top:4px}
+.btn-login:hover{background:var(--blue-l)}
+.login-hint{margin-top:16px;padding:12px;background:var(--surface2);border-radius:var(--rs);font-size:11px;color:var(--text2);line-height:1.7}
+
+/* APP */
+#app{display:none;height:100vh;overflow:hidden;flex-direction:column}
+
+/* TOPBAR */
+.topbar{height:56px;background:#fff;border-bottom:1.5px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;box-shadow:var(--shadow)}
+.topbar-brand{font-family:var(--font-h);font-size:17px;font-weight:800;color:var(--blue);letter-spacing:-0.5px;flex-shrink:0}
+.topbar-brand span{color:var(--accent2)}
+.topbar-divider{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.topbar-title{display:flex;flex-direction:column;line-height:1.2;flex-shrink:0}
+.topbar-title strong{font-size:12px;font-weight:700;color:var(--text)}
+.topbar-title small{font-size:10px;color:var(--text3)}
+.topbar-dates{display:flex;align-items:center;gap:8px;margin-left:12px}
+.date-label{font-size:11px;color:var(--text3);font-weight:600}
+.date-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-size:12px;padding:5px 8px;outline:none;font-family:var(--font-b)}
+.date-sep{color:var(--text3);font-size:11px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.live-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,.25);flex-shrink:0}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.user-chip{display:flex;align-items:center;gap:8px}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:var(--font-h)}
+.user-info{line-height:1.3}
+.user-name{font-size:12px;font-weight:600}
+.user-role{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
+.btn-logout{background:none;border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text2);font-size:12px;padding:5px 12px;cursor:pointer;font-family:var(--font-b);transition:.2s}
+.btn-logout:hover{border-color:var(--danger);color:var(--danger)}
+
+/* LAYOUT */
+.app-body{display:flex;flex:1;overflow:hidden}
+.sidebar{width:220px;background:#fff;border-right:1.5px solid var(--border);overflow-y:auto;flex-shrink:0;padding:12px 0}
+.main{flex:1;overflow-y:auto;padding:24px}
+
+/* SIDEBAR */
+.sidebar-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:8px 16px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-radius:0 10px 10px 0;margin-right:8px;font-size:13px;color:var(--text2);transition:.15s;position:relative}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--blue-soft);color:var(--blue);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue);border-radius:0 2px 2px 0}
+.ico{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-count{margin-left:auto;background:var(--surface2);color:var(--text3);font-size:10px;padding:1px 6px;border-radius:10px}
+.nav-sub{padding-left:46px;font-size:12px;color:var(--text3);padding-top:4px;padding-bottom:4px;cursor:pointer;transition:.15s}
+.nav-sub:hover{color:var(--blue)}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* CARDS */
+.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-title{font-family:var(--font-h);font-size:14px;font-weight:700;color:var(--text)}
+.card-body{padding:16px 18px}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow)}
+.kpi-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.kpi-value{font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--text);line-height:1;margin-bottom:4px}
+.kpi-sub{font-size:11px;color:var(--text3)}
+.kpi-delta{font-size:11px;font-weight:600;margin-top:4px}
+.kpi-delta.up{color:var(--green)}
+.kpi-delta.down{color:var(--danger)}
+
+/* CAMPAIGN CARDS */
+.camp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.camp-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);transition:.2s}
+.camp-card:hover{box-shadow:var(--shadow-lg);transform:translateY(-1px)}
+.camp-card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.camp-icon{width:40px;height:40px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.camp-info{flex:1;min-width:0}
+.camp-name{font-weight:700;font-size:13px;color:var(--text);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.camp-client{font-size:11px;color:var(--text3)}
+.camp-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.camp-metric{background:var(--surface2);border-radius:var(--rs);padding:8px;text-align:center}
+.camp-metric-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.camp-metric-value{font-size:13px;font-weight:700;color:var(--text)}
+.camp-decision{border-radius:var(--rs);padding:10px 12px;font-size:12px;display:flex;align-items:center;gap:8px;font-weight:600}
+.dec-scale{background:rgba(5,150,105,.1);color:var(--green);border:1px solid rgba(5,150,105,.25)}
+.dec-stop{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(220,38,38,.25)}
+.dec-optimize{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(217,119,6,.25)}
+.dec-pause{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.25)}
+
+/* TAGS */
+.tag{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600}
+.tag-active{background:var(--green-bg);color:var(--green)}
+.tag-paused{background:var(--surface2);color:var(--text3)}
+.tag-meta{background:var(--meta-bg);color:var(--meta)}
+.tag-google{background:var(--google-bg);color:var(--google)}
+
+/* FILTERS */
+.filters-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:10px 14px;box-shadow:var(--shadow)}
+.filter-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.filter-sep{width:1px;height:18px;background:var(--border)}
+.filter-tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);color:var(--text2);transition:.15s;background:var(--surface)}
+.filter-tag.active,.filter-tag:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.filter-select{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-size:12px;padding:5px 10px;outline:none;font-family:var(--font-b)}
+.search-input{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-size:12px;padding:6px 12px;outline:none;font-family:var(--font-b);width:200px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--rs);font-family:var(--font-b);font-size:13px;font-weight:600;padding:8px 16px;cursor:pointer;transition:.2s}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:var(--blue-l)}
+.btn-outline{background:var(--surface);border:1.5px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table th{background:var(--surface2);padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;border-bottom:1.5px solid var(--border)}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--surface2)}
+
+/* SECTION HEADER */
+.section-title{font-family:var(--font-h);font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+.section-sub{font-size:12px;color:var(--text3)}
+.section-header{margin-bottom:20px}
+
+/* STATUS PANEL */
+.status-panel{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.status-item{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px}
+.status-meta{background:var(--meta-bg);color:var(--meta);border:1px solid rgba(24,119,242,.2)}
+.status-google{background:rgba(217,119,6,.1);color:var(--warn);border:1px solid rgba(217,119,6,.2)}
+.status-time{margin-left:auto;font-size:11px;color:var(--text3)}
+
+/* ALERT */
+.alert{border-radius:var(--rs);padding:12px 16px;margin-bottom:14px;display:flex;gap:10px;font-size:13px}
+.alert-danger{background:var(--danger-bg);border-left:4px solid var(--danger);color:var(--danger)}
+.alert-warn{background:var(--warn-bg);border-left:4px solid var(--warn);color:var(--warn)}
+.alert-success{background:var(--green-bg);border-left:4px solid var(--green);color:var(--green)}
+.alert-info{background:var(--blue-soft);border-left:4px solid var(--blue);color:var(--blue)}
+
+/* CHART */
+.chart-wrap{position:relative;height:220px;padding:8px}
+
+/* AI CHAT */
+.ai-chat{min-height:280px;max-height:450px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--surface2);border-radius:var(--rs)}
+.ai-msg-bot{display:flex;gap:10px;align-items:flex-start}
+.ai-bot-icon{width:30px;height:30px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ai-bubble-bot{background:var(--surface);border-radius:0 10px 10px 10px;padding:10px 14px;font-size:13px;line-height:1.6;max-width:88%;box-shadow:var(--shadow)}
+.ai-bubble-user{background:var(--blue);color:#fff;border-radius:10px 0 10px 10px;padding:10px 14px;font-size:13px;line-height:1.6;max-width:88%;margin-left:auto}
+.ai-input-area{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--border);align-items:flex-end}
+.ai-textarea{flex:1;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font-b);font-size:13px;padding:9px 12px;resize:none;height:64px;outline:none;transition:.2s}
+.ai-textarea:focus{border-color:var(--blue)}
+.ai-thinking span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--blue);animation:think .8s infinite}
+.ai-thinking span:nth-child(2){animation-delay:.15s}
+.ai-thinking span:nth-child(3){animation-delay:.3s}
+@keyframes think{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+@media print{.sidebar,.topbar{display:none!important}.main{margin-left:0}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--blue)">AVANTEX<span style="color:var(--accent2)">.</span></div>
+      <div style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-top:2px">Sistema de Monitoreo de Pauta</div>
+    </div>
+    <div class="login-title">Iniciar Sesión</div>
+    <div class="login-sub">Panel de campañas digitales</div>
+    <div class="form-group">
+      <label class="form-label">Correo electrónico</label>
+      <input class="form-input" id="login-email" type="email" placeholder="correo@avantex.com" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contraseña</label>
+      <input class="form-input" id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-error" id="login-err">Correo o contraseña incorrectos.</div>
+    <button class="btn-login" onclick="doLogin()">Iniciar Sesión</button>
+    <div class="login-hint">
+      <strong style="color:var(--blue)">Admin:</strong> admin@avantex.com / admin123<br>
+      <strong style="color:var(--blue)">Marketing:</strong> marketing@avantex.com / mkt123<br>
+      <strong style="color:var(--blue)">Dirección:</strong> direccion@avantex.com / dir123
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-brand">AVANTEX<span>.</span></div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-title">
+      <strong>🎯 Sistema Centralizado de Monitoreo</strong>
+      <small>Análisis y Optimización de Campañas · Abril 2026</small>
+    </div>
+    <div class="topbar-dates">
+      <span class="date-label">Período:</span>
+      <input type="date" class="date-input" value="2026-04-01">
+      <span class="date-sep">—</span>
+      <input type="date" class="date-input" value="2026-04-09">
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge"><div class="live-dot"></div>Meta En vivo</div>
+      <div class="topbar-divider"></div>
+      <div class="user-chip">
+        <div class="user-avatar" id="top-avatar">A</div>
+        <div class="user-info">
+          <div class="user-name" id="top-name">Admin</div>
+          <div class="user-role" id="top-role">Admin</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="app-body">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-label">Navegación</div>
+      <div class="nav-item active" id="nav-overview" onclick="showPage('overview')"><span class="ico">📊</span>Resumen General</div>
+      <div class="nav-item" id="nav-ai" onclick="showPage('ai')"><span class="ico">🤖</span>Agente IA</div>
+
+      <div class="sidebar-label" style="margin-top:8px">🏢 Unidad de Negocio</div>
+      <div class="nav-item" id="nav-b2c" onclick="showPage('b2c')"><span class="ico">🌸</span>Aromatex B2C</div>
+      <div class="nav-item" id="nav-b2b" onclick="showPage('b2b')"><span class="ico">🌸</span>Aromatex B2B</div>
+      <div class="nav-item" id="nav-weldu" onclick="showPage('weldu')"><span class="ico">📱</span>Weldu</div>
+      <div class="nav-item" id="nav-pestex" onclick="showPage('pestex')"><span class="ico">🌿</span>Pestex</div>
+      <div class="nav-item" id="nav-weldex" onclick="showPage('weldex')"><span class="ico">🔧</span>Weldex</div>
+
+      <div class="sidebar-label" style="margin-top:8px">Reportes</div>
+      <div class="nav-item" id="nav-budget" onclick="showPage('budget')"><span class="ico">💰</span>Presupuesto</div>
+      <div class="nav-item" id="nav-decisions" onclick="showPage('decisions')"><span class="ico">⚡</span>Decisiones</div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="page active" id="page-overview">
+        <div class="section-header">
+          <div class="section-title">Resumen General — Abril 2026</div>
+          <div class="section-sub">Abril 1–9 · Meta Ads (en vivo) + Google Ads · Grupo Avantex</div>
+        </div>
+
+        <div class="status-panel">
+          <span style="font-size:12px;font-weight:600;color:var(--text2)">Estado APIs:</span>
+          <div class="status-item status-meta">📘 Meta Ads — En vivo</div>
+          <div class="status-item status-google">🔴 Google Ads — ⏳ Aprobación token pendiente (1-2 días)</div>
+          <button class="btn btn-outline btn-sm" onclick="alert('Actualizando desde Meta Ads...')">🔄 Actualizar</button>
+          <span class="status-time">Datos al 09 Abr 2026</span>
+        </div>
+
+        <!-- KPIs OVERVIEW -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Gasto Total Meta</div>
+            <div class="kpi-value">$66,844</div>
+            <div class="kpi-sub">MXN · Abr 1-9</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Resultados Totales</div>
+            <div class="kpi-value">715</div>
+            <div class="kpi-sub">Conversaciones + Compras</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">CPR Promedio</div>
+            <div class="kpi-value">$93</div>
+            <div class="kpi-sub">MXN por resultado</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Mejor ROAS</div>
+            <div class="kpi-value" style="color:var(--green)">8.56x</div>
+            <div class="kpi-sub">PF Ticket Alto iOS</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Google Ads Gasto</div>
+            <div class="kpi-value">$16,867</div>
+            <div class="kpi-sub">MXN · Pestex/Weldex</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Mejor CPR del Mes</div>
+            <div class="kpi-value" style="color:var(--green)">$16</div>
+            <div class="kpi-sub">DAMARIS B2B WhatsApp</div>
+          </div>
+        </div>
+
+        <!-- ALERTAS -->
+        <div class="alert alert-danger"><span>🛑</span><div><strong>PAUSAR URGENTE:</strong> Roomspray, Velas, Rattan — ROAS 0.22x, $27,741 MXN gastados con ROI negativo. Cada día activo genera pérdida neta.</div></div>
+        <div class="alert alert-success"><span>🚀</span><div><strong>ESCALAR:</strong> Weldu Fumigaciones CDMX/MTY — CPR $19-21 MXN (bajó desde $137 en marzo). Triplicar presupuesto esta semana.</div></div>
+        <div class="alert alert-success"><span>🚀</span><div><strong>ESCALAR AGRESIVO:</strong> DAMARIS B2B — CPR $16 MXN, mejor resultado del portafolio completo. Duplicar presupuesto inmediatamente.</div></div>
+        <div class="alert alert-warn"><span>⚠️</span><div><strong>REVISAR URGENTE:</strong> ANGELICA B2B — CPR subió de $19 a $41 MXN (+111%). Identificar causa: cambio de audiencia o fatiga de creativo.</div></div>
+
+        <!-- CHART META vs GOOGLE -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">💰 Distribución de Gasto — Abril 2026</span></div>
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div><div class="chart-wrap"><canvas id="chart-spend-dist"></canvas></div></div>
+              <div><div class="chart-wrap"><canvas id="chart-spend-client"></canvas></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ B2C ═══ -->
+      <div class="page" id="page-b2c">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+            <span style="font-size:28px">🌸</span>
+            <div class="section-title">Aromatex B2C — Informe de Resultados</div>
+          </div>
+          <div class="section-sub">Meta Ads · Compras en línea · Abril 1-9, 2026</div>
+        </div>
+        <div class="filters-bar">
+          <span class="filter-label">Estado:</span>
+          <span class="filter-tag active">Todas</span>
+          <span class="filter-tag">Activas</span>
+          <span class="filter-tag">Pausadas</span>
+          <div class="filter-sep"></div>
+          <button class="btn btn-outline btn-sm" onclick="showPage('b2c')">🔄 Actualizar datos</button>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Gasto Total</div><div class="kpi-value">$47,394</div><div class="kpi-sub">MXN · Abr 1-9</div></div>
+          <div class="kpi-card"><div class="kpi-label">Compras</div><div class="kpi-value">62</div><div class="kpi-sub">Website purchases</div></div>
+          <div class="kpi-card"><div class="kpi-label">Mejor ROAS</div><div class="kpi-value" style="color:var(--green)">8.56x</div><div class="kpi-sub">PF Ticket Alto iOS</div></div>
+          <div class="kpi-card"><div class="kpi-label">Peor ROAS</div><div class="kpi-value" style="color:var(--danger)">0.22x</div><div class="kpi-sub">Roomspray/Velas</div></div>
+        </div>
+        <div class="camp-grid" id="camps-b2c"></div>
+      </div>
+
+      <!-- ═══ B2B ═══ -->
+      <div class="page" id="page-b2b">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+            <span style="font-size:28px">🌸</span>
+            <div class="section-title">Aromatex B2B — Informe de Resultados</div>
+          </div>
+          <div class="section-sub">Meta Ads · WhatsApp Leads · Abril 1-9, 2026</div>
+        </div>
+        <div class="filters-bar">
+          <span class="filter-label">Estado:</span>
+          <span class="filter-tag active">Todas</span>
+          <div class="filter-sep"></div>
+          <button class="btn btn-outline btn-sm" onclick="showPage('b2b')">🔄 Actualizar datos</button>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Gasto Total</div><div class="kpi-value">$16,217</div><div class="kpi-sub">MXN · Abr 1-9</div></div>
+          <div class="kpi-card"><div class="kpi-label">Conversaciones WA</div><div class="kpi-value">491</div><div class="kpi-sub">WhatsApp iniciadas</div></div>
+          <div class="kpi-card"><div class="kpi-label">Mejor CPR</div><div class="kpi-value" style="color:var(--green)">$16</div><div class="kpi-sub">DAMARIS — escalar</div></div>
+          <div class="kpi-card"><div class="kpi-label">Peor CPR</div><div class="kpi-value" style="color:var(--danger)">$41</div><div class="kpi-sub">ANGELICA — revisar</div></div>
+        </div>
+        <div class="camp-grid" id="camps-b2b"></div>
+      </div>
+
+      <!-- ═══ WELDU ═══ -->
+      <div class="page" id="page-weldu">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+            <span style="font-size:28px">📱</span>
+            <div class="section-title">Weldu — Informe de Resultados</div>
+          </div>
+          <div class="section-sub">Meta Ads · WhatsApp Fumigaciones · Abril 1-9, 2026</div>
+        </div>
+        <div class="alert alert-success"><span>🔥</span><div><strong>Transformación total vs Marzo:</strong> CPR bajó de $137 MXN a $19-21 MXN. Nueva estructura de campañas funcionando perfectamente. ESCALAR URGENTE.</div></div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Gasto Total</div><div class="kpi-value">$3,230</div><div class="kpi-sub">MXN · Abr 1-9</div></div>
+          <div class="kpi-card"><div class="kpi-label">Conversaciones WA</div><div class="kpi-value">162</div><div class="kpi-sub">WhatsApp iniciadas</div></div>
+          <div class="kpi-card"><div class="kpi-label">CPR Promedio</div><div class="kpi-value" style="color:var(--green)">$20</div><div class="kpi-sub">vs $137 en marzo</div></div>
+          <div class="kpi-card"><div class="kpi-label">Mejora vs Marzo</div><div class="kpi-value" style="color:var(--green)">-85%</div><div class="kpi-sub">reducción en CPR</div></div>
+        </div>
+        <div class="camp-grid" id="camps-weldu"></div>
+      </div>
+
+      <!-- ═══ PESTEX ═══ -->
+      <div class="page" id="page-pestex">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+            <span style="font-size:28px">🌿</span>
+            <div class="section-title">Pestex — Google Ads</div>
+          </div>
+          <div class="section-sub">Búsqueda · Control de plagas · Nuevo León · Abr 2026</div>
+        </div>
+        <div class="alert alert-info"><span>⏳</span><div><strong>Developer Token en proceso de aprobación</strong> — Google revisa en 1-2 días hábiles. Datos de dispositivos disponibles (Abr 1-8).</div></div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Gasto Total Abr</div><div class="kpi-value">$16,867</div><div class="kpi-sub">MXN · Abr 1-8</div></div>
+          <div class="kpi-card"><div class="kpi-label">Clics Totales</div><div class="kpi-value">765</div><div class="kpi-sub">Desktop + Mobile + Tablet</div></div>
+          <div class="kpi-card"><div class="kpi-label">Conversiones</div><div class="kpi-value">0</div><div class="kpi-sub">Campañas nuevas — aprendizaje</div></div>
+          <div class="kpi-card"><div class="kpi-label">Dominante Mobile</div><div class="kpi-value">72%</div><div class="kpi-sub">del gasto en móvil</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📱 Gasto por Dispositivo — Abril 2026</span></div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Dispositivo</th><th>Gasto</th><th>Impresiones</th><th>Clics</th><th>CPC Prom.</th><th>% del Total</th></tr></thead>
+              <tbody>
+                <tr><td>📱 Teléfonos móviles</td><td><strong>$12,146 MXN</strong></td><td>22,236</td><td>680</td><td>$17.86</td><td><span style="color:var(--blue);font-weight:700">72%</span></td></tr>
+                <tr><td>💻 Ordenadores</td><td>$4,673 MXN</td><td>1,156</td><td>74</td><td>$63.14</td><td>28%</td></tr>
+                <tr><td>📟 Tablets</td><td>$49 MXN</td><td>482,000</td><td>11</td><td>$4.47</td><td>&lt;1%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🎯 Campañas Activas</span></div>
+          <div class="card-body">
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <div class="kpi-card" style="flex:1;min-width:250px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="font-weight:700;font-size:13px">🔷 Aromatex B2B Búsqueda</div>
+                  <span class="tag tag-active">Activado</span>
+                </div>
+                <div style="font-size:12px;color:var(--text2)">Red de búsqueda · Keywords control de plagas empresariales · Fase de aprendizaje</div>
+              </div>
+              <div class="kpi-card" style="flex:1;min-width:250px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="font-weight:700;font-size:13px">🛍 Aromatex B2C Shopping</div>
+                  <span class="tag tag-active">Activado</span>
+                </div>
+                <div style="font-size:12px;color:var(--text2)">Shopping · Productos de aromaterapia · Fase de aprendizaje</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ WELDEX ═══ -->
+      <div class="page" id="page-weldex">
+        <div class="section-header">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+            <span style="font-size:28px">🔧</span>
+            <div class="section-title">Weldex — Google Ads</div>
+          </div>
+          <div class="section-sub">App de Servicios del Hogar · Abril 2026</div>
+        </div>
+        <div class="alert alert-info"><span>🚀</span><div><strong>Campaña nueva en fase de aprendizaje</strong> — Google Ads activo desde Abril 2026. El algoritmo optimiza durante las primeras 2-3 semanas. Conversiones comenzarán a registrarse pronto.</div></div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Gasto Inicial</div><div class="kpi-value">$16,867</div><div class="kpi-sub">MXN · primeros 8 días</div></div>
+          <div class="kpi-card"><div class="kpi-label">Clics</div><div class="kpi-value">765</div><div class="kpi-sub">visitas a la app</div></div>
+          <div class="kpi-card"><div class="kpi-label">Impresiones</div><div class="kpi-value">505K</div><div class="kpi-sub">anuncios mostrados</div></div>
+          <div class="kpi-card"><div class="kpi-label">Mobile</div><div class="kpi-value">89%</div><div class="kpi-sub">tráfico en móvil</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🤖 Análisis IA — Weldex</span><button class="btn btn-blue btn-sm" onclick="aiWeldex()">Generar análisis</button></div>
+          <div id="weldex-ai" class="card-body"><div style="color:var(--text2);font-size:13px">Haz clic en "Generar análisis" para obtener recomendaciones IA específicas para Weldex.</div></div>
+        </div>
+      </div>
+
+      <!-- ═══ PRESUPUESTO ═══ -->
+      <div class="page" id="page-budget">
+        <div class="section-header">
+          <div class="section-title">💰 Presupuesto — Abril 2026</div>
+          <div class="section-sub">Distribución y control de inversión por unidad de negocio</div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Total Invertido Meta</div><div class="kpi-value">$66,844</div><div class="kpi-sub">MXN · Abr 1-9</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total Google Ads</div><div class="kpi-value">$16,867</div><div class="kpi-sub">MXN · Abr 1-8</div></div>
+          <div class="kpi-card"><div class="kpi-label">Total General</div><div class="kpi-value">$83,711</div><div class="kpi-sub">MXN · Ambas plataformas</div></div>
+          <div class="kpi-card"><div class="kpi-label">Promedio Diario</div><div class="kpi-value">$9,301</div><div class="kpi-sub">MXN/día en Abril</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Gasto por Unidad de Negocio</span></div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Unidad</th><th>Plataforma</th><th>Gasto Abr</th><th>Resultados</th><th>CPR</th><th>Estado</th></tr></thead>
+              <tbody>
+                <tr><td>🌸 Aromatex B2C</td><td><span class="tag tag-meta">Meta</span></td><td>$47,394</td><td>62 compras</td><td>$765 prom.</td><td><span class="tag tag-active">Activo</span></td></tr>
+                <tr><td>🌸 Aromatex B2B</td><td><span class="tag tag-meta">Meta</span></td><td>$16,217</td><td>491 conv.</td><td>$33 prom.</td><td><span class="tag tag-active">Activo</span></td></tr>
+                <tr><td>📱 Weldu</td><td><span class="tag tag-meta">Meta</span></td><td>$3,230</td><td>162 conv.</td><td>$20 prom.</td><td><span class="tag tag-active">Activo</span></td></tr>
+                <tr><td>🌿 Pestex</td><td><span class="tag tag-google">Google</span></td><td>$16,867</td><td>0 conv.</td><td>—</td><td><span class="tag" style="background:var(--warn-bg);color:var(--warn)">Aprendizaje</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ DECISIONES ═══ -->
+      <div class="page" id="page-decisions">
+        <div class="section-header">
+          <div class="section-title">⚡ Decisiones de Campaña — Abril 2026</div>
+          <div class="section-sub">Acciones prioritarias basadas en datos reales de la primera semana</div>
+        </div>
+        <div id="decisions-container"></div>
+      </div>
+
+      <!-- ═══ AGENTE IA ═══ -->
+      <div class="page" id="page-ai">
+        <div class="section-header">
+          <div class="section-title">🤖 Agente de Análisis IA</div>
+          <div class="section-sub">Feedback, recomendaciones y optimizaciones inteligentes · Datos Abril 2026</div>
+        </div>
+        <div class="alert alert-info"><span>💡</span><div>El agente tiene acceso completo a los datos de Abril 2026 de todas las campañas. Pregúntale sobre cualquier campaña, métrica o estrategia.</div></div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+          <button class="btn btn-blue" onclick="aiQuick('general')">📊 Análisis General</button>
+          <button class="btn btn-outline" onclick="aiQuick('meta')">📘 Optimizar Meta Ads</button>
+          <button class="btn btn-outline" onclick="aiQuick('b2b')">💬 WhatsApp B2B</button>
+          <button class="btn btn-outline" onclick="aiQuick('weldu')">📱 Escalar Weldu</button>
+          <button class="btn btn-outline" onclick="aiQuick('presupuesto')">💰 Redistribuir Presupuesto</button>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">💬 Chat con el Agente</span><span id="ai-status" style="font-size:11px;color:var(--text3)">Listo</span></div>
+          <div class="ai-chat" id="ai-chat">
+            <div class="ai-msg-bot">
+              <div class="ai-bot-icon">🤖</div>
+              <div class="ai-bubble-bot">
+                ¡Hola! Tengo acceso a los datos de <strong>Abril 1-9, 2026</strong> de todas tus campañas.<br><br>
+                🛑 <strong>Alerta crítica:</strong> Roomspray/Velas — ROAS 0.22x, pausar urgente<br>
+                🚀 <strong>Oportunidad:</strong> Weldu bajó de $137 a $20 CPR — escalar ya<br>
+                🚀 <strong>Top performer:</strong> PF Ticket Alto iOS — ROAS 8.56x<br><br>
+                ¿Sobre qué quieres que analice primero?
+              </div>
+            </div>
+          </div>
+          <div class="ai-input-area">
+            <textarea class="ai-textarea" id="ai-input" placeholder="Ej: ¿Qué campañas debo pausar? ¿Cómo redistribuyo el presupuesto? ¿Por qué bajó ANGELICA?" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"></textarea>
+            <button class="btn btn-blue" onclick="aiSend()" style="height:64px;flex-direction:column;gap:4px"><span style="font-size:18px">🚀</span><span>Enviar</span></button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /app-body -->
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════════════════
+// USERS
+// ══════════════════════════════════════════════
+const USERS = [
+  {email:'admin@avantex.com', pass:'admin123', role:'admin', name:'Admin'},
+  {email:'marketing@avantex.com', pass:'mkt123', role:'marketing', name:'Marketing'},
+  {email:'direccion@avantex.com', pass:'dir123', role:'direccion', name:'Dirección'}
+];
+let currentUser = null;
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  const user = USERS.find(u => u.email === email && u.pass === pass);
+  if (!user) { document.getElementById('login-err').style.display = 'block'; return; }
+  currentUser = user;
+  document.getElementById('login-screen').style.display = 'none';
+  const app = document.getElementById('app');
+  app.style.display = 'flex';
+  document.getElementById('top-avatar').textContent = user.name.charAt(0).toUpperCase();
+  document.getElementById('top-name').textContent = user.name;
+  document.getElementById('top-role').textContent = user.role === 'admin' ? 'Admin' : user.role === 'marketing' ? 'Marketing' : 'Dirección';
+  init();
+}
+
+function doLogout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-pass').value = '';
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  const nav = document.getElementById('nav-' + id);
+  if (page) page.classList.add('active');
+  if (nav) nav.classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+// CAMPAIGN DATA — ABRIL 2026
+// ══════════════════════════════════════════════
+const CAMPS = {
+  b2c: [
+    {name:'PF - Ticket Alto iOS', status:'active', spent:11652, results:22, cpr:530, cpm:75.4, ctr:1.53, roas:8.56, icon:'📦',
+     decision:'scale', dec_text:'🚀 ESCALAR — ROAS 8.56x excepcional. Aumentar presupuesto 40-50% esta semana.',
+     pros:['ROAS 8.56x — mejor de todo el portafolio','22 compras en 9 días','CTR 1.53% mejorado vs marzo'],
+     cons:['CPR $530 el más alto de B2C','Solo 9 días de datos']},
+    {name:'Roomspray, Velas, Rattan', status:'active', spent:27741, results:27, cpr:1027, cpm:179.2, ctr:0.57, roas:0.22, icon:'🕯',
+     decision:'stop', dec_text:'🛑 PAUSAR URGENTE — ROAS 0.22x. $27,741 invertidos con pérdida neta. Redirigir a PF Ticket Alto.',
+     pros:['Alcance de 75K personas'],
+     cons:['ROAS 0.22x — pérdida por cada peso invertido','CPR $1,027 MXN el peor del portafolio','CPM $179 el más caro']},
+    {name:'Aromatex General (ventas)', status:'active', spent:8001, results:13, cpr:615, cpm:153.5, ctr:0.60, roas:1.00, icon:'🌸',
+     decision:'optimize', dec_text:'🔧 OPTIMIZAR — ROAS 1.0x en punto de equilibrio. Revisar audiencia y creativos para llegar a ROAS >4x.',
+     pros:['13 compras en 9 días','Frecuencia baja — audiencia fresca'],
+     cons:['ROAS 1.0x — sin utilidad','CPM $153.5 muy alto','CTR 0.60% bajo']}
+  ],
+  b2b: [
+    {name:'DAMARIS — WhatsApp', status:'active', spent:1357, results:83, cpr:16, cpm:125.7, ctr:2.40, roas:null, icon:'💬',
+     decision:'scale', dec_text:'🚀 ESCALAR AGRESIVO — CPR $16 MXN, el mejor del portafolio completo. Duplicar presupuesto ahora.',
+     pros:['CPR $16 MXN — el más bajo de todo el portafolio','83 conversaciones con presupuesto pequeño','CTR 2.40% excelente'],
+     cons:['Presupuesto muy limitado vs resultados']},
+    {name:'MTY — WhatsApp', status:'active', spent:3441, results:104, cpr:33, cpm:79.9, ctr:2.53, roas:null, icon:'💬',
+     decision:'scale', dec_text:'🚀 ESCALAR — CPR $33 competitivo, CTR 2.53% excelente. Aumentar 20-30%.',
+     pros:['CTR 2.53% excelente','104 conversaciones','CPM $79.9 el más bajo'],
+     cons:['CPR subió ligeramente vs marzo']},
+    {name:'MAGNALI — WhatsApp', status:'active', spent:1872, results:61, cpr:31, cpm:129.1, ctr:2.60, roas:null, icon:'💬',
+     decision:'scale', dec_text:'🚀 ESCALAR — CPR $31 eficiente, CTR 2.60% el mejor del grupo B2B.',
+     pros:['CTR 2.60% excelente','CPR $31 eficiente'],
+     cons:['CPM $129 relativamente alto']},
+    {name:'JANETH — WhatsApp', status:'active', spent:1300, results:41, cpr:32, cpm:108.3, ctr:2.20, roas:null, icon:'💬',
+     decision:'scale', dec_text:'🚀 ESCALAR — Mejoró dramáticamente desde $36 CPR en marzo. Aumentar 30%.',
+     pros:['CPR bajó de $36 a $32 vs marzo','Frecuencia 1.50 — audiencia muy fresca'],
+     cons:['Volumen aún bajo con 41 conversaciones']},
+    {name:'CDMX — WhatsApp', status:'active', spent:5802, results:143, cpr:41, cpm:128.3, ctr:2.07, roas:null, icon:'💬',
+     decision:'optimize', dec_text:'🔧 OPTIMIZAR — Mayor gasto del grupo B2B con CPR subiendo. Revisar segmentación.',
+     pros:['143 conversaciones — mayor volumen','CTR 2.07%'],
+     cons:['CPR $41 subió vs marzo ($37)','CPM $128.3 alto']},
+    {name:'ANGELICA — WhatsApp', status:'active', spent:2445, results:59, cpr:41, cpm:150.5, ctr:0.72, roas:null, icon:'💬',
+     decision:'pause', dec_text:'⚠️ REVISAR URGENTE — CPR subió de $19.40 a $41 MXN (+111%). CTR cayó de 2.55% a 0.72%. Algo cambió.',
+     pros:['59 conversaciones'],
+     cons:['CPR +111% vs marzo','CTR cayó dramáticamente','CPM $150.5 el más alto del grupo']}
+  ],
+  weldu: [
+    {name:'Fumigaciones — Monterrey', status:'active', spent:1613, results:86, cpr:19, cpm:175.2, ctr:4.79, roas:null, icon:'📱',
+     decision:'scale', dec_text:'🚀 ESCALAR — CPR $19 MXN, el mejor de Weldu. 86 conversaciones vs $137 CPR en marzo. Aumentar 50-100%.',
+     pros:['CPR $19 vs $137 en marzo (-86%)','86 conversaciones el mayor volumen','CTR 4.79% excelente','Frecuencia 1.34 muy baja'],
+     cons:['CPM $175 relativamente alto','Solo 9 días de datos']},
+    {name:'Fumigaciones — CDMX', status:'active', spent:1617, results:76, cpr:21, cpm:132.1, ctr:5.60, roas:null, icon:'📱',
+     decision:'scale', dec_text:'🚀 ESCALAR — CPR $21 MXN, CTR 5.60% el más alto de todo el portafolio. Aumentar 50%.',
+     pros:['CTR 5.60% el más alto del portafolio completo','CPR $21 excelente','CPM $132 más bajo que MTY'],
+     cons:['Solo 9 días de datos']}
+  ]
+};
+
+// ══════════════════════════════════════════════
+// RENDER CAMPS
+// ══════════════════════════════════════════════
+const DEC_CSS = {scale:'dec-scale', stop:'dec-stop', optimize:'dec-optimize', pause:'dec-pause'};
+
+function renderCampSection(client) {
+  const container = document.getElementById('camps-' + client);
+  if (!container || !CAMPS[client]) return;
+  container.innerHTML = CAMPS[client].map(c => `
+    <div class="camp-card">
+      <div class="camp-card-header">
+        <div class="camp-icon">${c.icon}</div>
+        <div class="camp-info">
+          <div class="camp-name">${c.name}</div>
+          <div class="camp-client">${c.status === 'active' ? '🟢 Activa' : '⚫ Pausada'} · Meta Ads</div>
+        </div>
+        <span class="tag ${c.status === 'active' ? 'tag-active' : 'tag-paused'}">${c.status === 'active' ? 'Activa' : 'Pausada'}</span>
+      </div>
+      <div class="camp-metrics">
+        <div class="camp-metric"><div class="camp-metric-label">Gasto</div><div class="camp-metric-value">$${c.spent.toLocaleString()}</div></div>
+        <div class="camp-metric"><div class="camp-metric-label">Resultados</div><div class="camp-metric-value">${c.results}</div></div>
+        <div class="camp-metric"><div class="camp-metric-label">CPR</div><div class="camp-metric-value">$${c.cpr}</div></div>
+        <div class="camp-metric"><div class="camp-metric-label">CTR</div><div class="camp-metric-value">${c.ctr}%</div></div>
+        <div class="camp-metric"><div class="camp-metric-label">CPM</div><div class="camp-metric-value">$${c.cpm}</div></div>
+        <div class="camp-metric"><div class="camp-metric-label">ROAS</div><div class="camp-metric-value">${c.roas ? c.roas + 'x' : '—'}</div></div>
+      </div>
+      <div class="camp-decision ${DEC_CSS[c.decision]}">${c.dec_text}</div>
+    </div>
+  `).join('');
+}
+
+function renderDecisions() {
+  const container = document.getElementById('decisions-container');
+  if (!container) return;
+  const all = [...CAMPS.b2c, ...CAMPS.b2b, ...CAMPS.weldu];
+  const order = {stop:0, pause:1, scale:2, optimize:3};
+  const sorted = [...all].sort((a,b) => (order[a.decision]||9) - (order[b.decision]||9));
+  container.innerHTML = sorted.map(c => `
+    <div class="camp-card">
+      <div class="camp-card-header">
+        <div class="camp-icon">${c.icon}</div>
+        <div class="camp-info">
+          <div class="camp-name">${c.name}</div>
+          <div class="camp-client">Gasto: $${c.spent.toLocaleString()} · CPR: $${c.cpr} · CTR: ${c.ctr}%</div>
+        </div>
+      </div>
+      <div class="camp-decision ${DEC_CSS[c.decision]}">${c.dec_text}</div>
+      ${c.pros ? `<div style="margin-top:10px;font-size:12px"><strong>✅ A favor:</strong><ul style="margin-top:4px;padding-left:18px;color:var(--text2)">${c.pros.map(p=>'<li>'+p+'</li>').join('')}</ul></div>` : ''}
+      ${c.cons ? `<div style="margin-top:6px;font-size:12px"><strong>⚠️ En contra:</strong><ul style="margin-top:4px;padding-left:18px;color:var(--text2)">${c.cons.map(p=>'<li>'+p+'</li>').join('')}</ul></div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ══════════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════════
+const BLUE = '#0821b0', RED = '#EA4335', GREEN = '#059669';
+const BLUE_L = 'rgba(8,33,176,0.1)', RED_L = 'rgba(234,67,53,0.1)';
+let charts = {};
+
+function mkChart(id, type, labels, datasets, opts) {
+  if (charts[id]) { charts[id].destroy(); }
+  const ctx = document.getElementById(id);
+  if (!ctx) return;
+  charts[id] = new Chart(ctx, {
+    type, data: {labels, datasets},
+    options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:opts?.legend!==false,labels:{font:{size:11}}}}, ...opts?.scales ? {scales:opts.scales} : {}}
+  });
+}
+
+function initCharts() {
+  // Spend distribution by platform
+  mkChart('chart-spend-dist', 'doughnut',
+    ['Meta Ads', 'Google Ads'],
+    [{data:[66844, 16867], backgroundColor:['#1877F2','#EA4335'], borderWidth:0}],
+    {legend:true}
+  );
+  // Spend by client
+  mkChart('chart-spend-client', 'bar',
+    ['Aromatex B2C', 'Aromatex B2B', 'Weldu', 'Google'],
+    [{label:'Gasto MXN', data:[47394, 16217, 3230, 16867],
+      backgroundColor:['#1877F2','#7c3aed','#059669','#EA4335'], borderRadius:6}],
+    {legend:false, scales:{x:{grid:{display:false},ticks:{color:'#94a3b8',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#94a3b8',font:{size:10}}}}}
+  );
+}
+
+// ══════════════════════════════════════════════
+// AI AGENT
+// ══════════════════════════════════════════════
+const AI_PROMPTS = {
+  general: 'Analiza todas las campañas de Meta Ads de Abril 2026. Dame un resumen ejecutivo del rendimiento, las 3 mejores y las 3 peores, con acciones concretas y priorizadas.',
+  meta: 'Analiza en detalle las campañas de Meta Ads de Abril 2026. Foco en ROAS, CPR y CTR. Acciones concretas para esta semana.',
+  b2b: 'Analiza el portafolio de WhatsApp B2B de Aromatex en Abril 2026. Detalla cada vendedora: DAMARIS CPR $16, MTY $33, MAGNALI $31, JANETH $32, CDMX $41, ANGELICA $41. Prioriza acciones.',
+  weldu: 'Weldu bajó de CPR $137 a $20 MXN en Abril 2026. CDMX $21, MTY $19. Como escalar manteniendo este CPR? Cuanto presupuesto recomiendas?',
+  presupuesto: 'Tenemos $83,711 MXN invertidos en Abril 2026 en Meta ($66,844) y Google ($16,867). Roomspray/Velas tiene ROAS 0.22x gastando $27,741. Como redistribuyo el presupuesto para maximizar resultados?'
+};
+
+const AI_CONTEXT = `Eres experto senior en Meta Ads y Google Ads para Grupo Avantex, agencia digital en Monterrey Mexico. DATOS REALES ABRIL 1-9, 2026:
+
+META B2C: PF Ticket Alto iOS $11,652 ROAS 8.56x, Roomspray/Velas $27,741 ROAS 0.22x (URGENTE PAUSAR), Aromatex General $8,001 ROAS 1.0x.
+META B2B WhatsApp: DAMARIS $1,357 CPR $16 (MEJOR), MTY $3,441 CPR $33, MAGNALI $1,872 CPR $31, JANETH $1,300 CPR $32, CDMX $5,802 CPR $41, ANGELICA $2,445 CPR $41 (subio de $19).
+WELDU Fumigaciones: CDMX $1,617 CPR $21, MTY $1,613 CPR $19 (bajaron de $137 en marzo).
+GOOGLE ADS Pestex: Campanas nuevas, 0 conv, gasto $16,867 MXN, mobile 72%.
+
+Responde en espanol. Usa emojis. Se directo y accionable. Siempre termina con prioridades numeradas.`;
+
+function aiAddMsg(text, isUser) {
+  const chat = document.getElementById('ai-chat');
+  const div = document.createElement('div');
+  if (isUser) {
+    div.innerHTML = `<div class="ai-bubble-user">${text}</div>`;
+    div.style.display = 'flex';
+    div.style.justifyContent = 'flex-end';
+  } else {
+    div.className = 'ai-msg-bot';
+    div.innerHTML = `<div class="ai-bot-icon">🤖</div><div class="ai-bubble-bot">${text}</div>`;
+  }
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function aiShowThinking() {
+  const chat = document.getElementById('ai-chat');
+  const div = document.createElement('div');
+  div.id = 'ai-thinking-div';
+  div.className = 'ai-msg-bot';
+  div.innerHTML = '<div class="ai-bot-icon">🤖</div><div class="ai-bubble-bot"><div class="ai-thinking"><span></span><span></span><span></span></div></div>';
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function aiRemoveThinking() {
+  const el = document.getElementById('ai-thinking-div');
+  if (el) el.remove();
+}
+
+async function aiCall(msg) {
+  const status = document.getElementById('ai-status');
+  if (status) status.textContent = 'Analizando...';
+  aiShowThinking();
+
+  // Usa el servidor local (Render) como proxy para evitar CORS
+  const API_URL = window.location.origin + '/api/claude';
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, system: AI_CONTEXT })
+    });
+    const data = await res.json();
+    aiRemoveThinking();
+    const reply = data.reply || data.error || 'Sin respuesta del agente';
+    const formatted = reply.split('\n').join('<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    aiAddMsg(formatted, false);
+  } catch (err) {
+    aiRemoveThinking();
+    aiAddMsg('Error al conectar con el servidor. Verifica que el servidor Render este activo.', false);
+    console.error(err);
+  }
+  if (status) status.textContent = 'Listo';
+}
+
+function aiSend() {
+  const input = document.getElementById('ai-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  aiAddMsg(msg, true);
+  aiCall(msg);
+}
+
+function aiQuick(type) {
+  showPage('ai');
+  const msg = AI_PROMPTS[type] || AI_PROMPTS.general;
+  aiAddMsg(msg, true);
+  aiCall(msg);
+}
+
+async function aiWeldex() {
+  const output = document.getElementById('weldex-ai');
+  if (!output) return;
+  output.innerHTML = '<div class="ai-thinking"><span></span><span></span><span></span></div>';
+  try {
+    const res = await fetch(window.location.origin + '/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'Analiza Weldex Google Ads abril 2026: campanas nuevas, 0 conv, $16,867 MXN gasto, 765 clics, mobile 72%. Recomendaciones para fase de aprendizaje.', system: AI_CONTEXT })
+    });
+    const text = await res.text();
+    let reply = '';
+    try { const d = JSON.parse(text); reply = d.reply || d.error || text; } catch(e) { reply = text; }
+    const formatted = reply.split('\n').join('<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    output.innerHTML = '<div style="font-size:13px;line-height:1.8">' + formatted + '</div>';
+  } catch (err) {
+    output.innerHTML = '<div style="color:var(--danger)">Error al conectar.</div>';
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+function init() {
+  renderCampSection('b2c');
+  renderCampSection('b2b');
+  renderCampSection('weldu');
+  renderDecisions();
+  initCharts();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const t = new Date();
+  t.setDate(t.getDate() + 2);
+});
+</script>
+</body>
+</html>
